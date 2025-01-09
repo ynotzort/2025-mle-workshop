@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from datetime import datetime, timedelta
-import pandas as pd
+import argparse
 import pickle
+from datetime import datetime, timedelta
+
+import pandas as pd
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
@@ -30,7 +32,8 @@ def train(train_month: datetime, validation_month: datetime, output_filename: st
     val_url = url_template.format(
         year=validation_month.year, month=validation_month.month
     )
-    print(train_url, val_url)
+    print(f"{train_url=}")
+    print(f"{val_url=}")
     df_train = read_dataframe(train_url)
     df_val = read_dataframe(val_url)
 
@@ -58,8 +61,42 @@ def train(train_month: datetime, validation_month: datetime, output_filename: st
 
 
 if __name__ == "__main__":
-    train(
-        train_month=datetime(2022, 1, 1),
-        validation_month=datetime(2022, 2, 1),
-        output_filename="lin_reg.bin",
+    ...
+    parser = argparse.ArgumentParser(
+        description="Train a model based on specific days and save it to a given path"
     )
+    parser.add_argument(
+        "--train-month", required=True, help="Training Month in the YYYY-MM format."
+    )
+    parser.add_argument(
+        "--validation-month",
+        required=True,
+        help="Validation Month in the YYYY-MM format.",
+    )
+    parser.add_argument(
+        "--model-save-path", required=True, help="Path where we save the trained model"
+    )
+    args = parser.parse_args()
+
+    train_year, train_month = args.train_month.split("-")
+    train_year = int(train_year)
+    train_month = int(train_month)
+
+    validation_year, validation_month = args.validation_month.split("-")
+    validation_year = int(validation_year)
+    validation_month = int(validation_month)
+
+    train_date = datetime(train_year, train_month, 1)
+    validation_date = datetime(validation_year, validation_month, 1)
+
+    model_save_path = args.model_save_path
+    train(
+        train_month=train_date,
+        validation_month=validation_date,
+        output_filename=model_save_path,
+    )
+    # train(
+    #     train_month=datetime(2022, 1, 1),
+    #     validation_month=datetime(2022, 2, 1),
+    #     output_filename="lin_reg.bin",
+    # )
