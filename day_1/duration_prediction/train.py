@@ -12,7 +12,15 @@ from sklearn.metrics import mean_squared_error
 from sklearn.pipeline import make_pipeline
 
 
-def read_dataframe(filename):
+def read_dataframe(filename: str) -> pd.DataFrame:
+    """Reads a dataframe and creates and prepares some features
+
+    Args:
+        filename (str): filepath to a parquet file
+
+    Returns:
+        pd.DataFrame: the parsed and processed dataframe
+    """
     df = pd.read_parquet(filename)
 
     df["duration"] = df.lpep_dropoff_datetime - df.lpep_pickup_datetime
