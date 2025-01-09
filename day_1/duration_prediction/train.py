@@ -4,12 +4,19 @@
 import click
 import pickle
 from datetime import datetime
+import logging
 
 import pandas as pd
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from sklearn.pipeline import make_pipeline
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
 
 
 def read_dataframe(filename: str) -> pd.DataFrame:
@@ -40,13 +47,14 @@ def train(train_month: datetime, validation_month: datetime, output_filename: st
     val_url = url_template.format(
         year=validation_month.year, month=validation_month.month
     )
-    print(f"{train_url=}")
-    print(f"{val_url=}")
+    logger.info(f"loaded training: {train_url=}")
+    logger.info(f"loaded validation: {val_url=}")
     df_train = read_dataframe(train_url)
     df_val = read_dataframe(val_url)
 
-    # TODO: maybe show in logs?
-    # len(df_train), len(df_val)
+    logger.debug(f"training datarows: {len(df_train)}, val datarows: {len(df_val)}")
+    if (len(df_train) == 0 or len(df_val) == 0):
+        logger.error("Train or Val Datasets are empty")
 
     categorical = ["PULocationID", "DOLocationID"]
     numerical = ["trip_distance"]
@@ -62,10 +70,11 @@ def train(train_month: datetime, validation_month: datetime, output_filename: st
     y_pred = pipeline.predict(val_dicts)
 
     mse = mean_squared_error(y_val, y_pred, squared=False)
-    print(f"mse: {mse}")
+    logger.info(f"mse: {mse}")
 
     with open(output_filename, "wb") as f_out:
         pickle.dump(pipeline, f_out)
+        logger.info(f"dumped model to {output_filename}")
 
 
 @click.command()
