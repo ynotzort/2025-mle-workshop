@@ -12,7 +12,7 @@ class TestTraining:
         output_file = "/tmp/__test_training_regression_value.bin"
         try:
             os.remove(output_file)
-        except:
+        except FileNotFoundError:
             ...
         assert not os.path.exists(output_file)
 
