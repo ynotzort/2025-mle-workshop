@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import logging
 import pickle
 from datetime import datetime
-import logging
 
 import pandas as pd
 from sklearn.feature_extraction import DictVectorizer
@@ -36,7 +36,11 @@ def read_dataframe(filename: str) -> pd.DataFrame:
     return df
 
 
-def train(train_month: datetime, validation_month: datetime, output_filename: str):
+def train(
+    train_month: datetime,
+    validation_month: datetime,
+    output_filename: str,
+) -> float:
     url_template = "https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_{year}-{month:02d}.parquet"
     train_url = url_template.format(year=train_month.year, month=train_month.month)
     val_url = url_template.format(
@@ -48,7 +52,7 @@ def train(train_month: datetime, validation_month: datetime, output_filename: st
     df_val = read_dataframe(val_url)
 
     logger.debug(f"training datarows: {len(df_train)}, val datarows: {len(df_val)}")
-    if (len(df_train) == 0 or len(df_val) == 0):
+    if len(df_train) == 0 or len(df_val) == 0:
         logger.error("Train or Val Datasets are empty")
 
     categorical = ["PULocationID", "DOLocationID"]
@@ -71,3 +75,4 @@ def train(train_month: datetime, validation_month: datetime, output_filename: st
         pickle.dump(pipeline, f_out)
         logger.info(f"dumped model to {output_filename}")
 
+    return mse
