@@ -10,7 +10,10 @@ class TestTraining:
         validation_date = datetime(2022, 2, 1)
         
         output_file = "/tmp/__test_training_regression_value.bin"
-        os.remove(output_file)
+        try:
+            os.remove(output_file)
+        except:
+            ...
         assert not os.path.exists(output_file)
 
         mse = train(train_date, validation_date, output_file)
