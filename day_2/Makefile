@@ -9,3 +9,11 @@ run:
 .PHONY: integration_test
 integration_test:
 	pipenv run python integration_tests/predict-test.py
+	
+.PHONY: docker_build
+docker_build:
+	docker build -t duration-prediction .
+
+.PHONY: docker_run 
+docker_run: docker_build
+	docker run -it --rm duration-prediction:latest
