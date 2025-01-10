@@ -15,7 +15,7 @@ tests:
 	pipenv run pytest
 	
 .PHONY: docker_build
-docker_build:
+docker_build: tests
 	docker build -t duration-prediction .
 
 .PHONY: docker_run 
