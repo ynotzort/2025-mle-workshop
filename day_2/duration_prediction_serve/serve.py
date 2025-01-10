@@ -1,17 +1,12 @@
 import pickle
-
+import os
 from flask import Flask, jsonify, request
 
-with open("./models/2022-01.bin", "rb") as f_in:
-    model = pickle.load(f_in)
+MODEL_PATH = os.getenv("MODEL_PATH", "model.bin")
+VERSION = os.getenv("VERSION", "n/a")
 
-# trip = {
-#     "PULocationID": "43",
-#     "DOLocationID": "238",
-#     "trip_distance": 1.16,
-# }
-# prediction = model.predict(trip)
-# print(prediction[0])
+with open(MODEL_PATH, "rb") as f_in:
+    model = pickle.load(f_in)
 
 
 def prepare_features(ride):
@@ -43,7 +38,8 @@ def predict_endpoint():
     result = {
         "prediction": {
             "duration": pred,
-        }
+        },
+        "version": VERSION,
     }
     return jsonify(result)
 
